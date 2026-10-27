@@ -1,0 +1,13 @@
+{
+  "name": "testdojo-challenges",
+  "private": true,
+  "description": "My solutions to the TestDojo automation challenges.",
+  "scripts": {
+    "test": "node scripts/run-checks.mjs",
+    "report": "npx playwright show-report .challenge-checks/playwright-report"
+  },
+  "devDependencies": {
+    "@playwright/test": "1.64.1",
+    "@types/node": "^22.0.0"
+  }
+}

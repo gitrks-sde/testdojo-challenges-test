@@ -1,0 +1,4 @@
+node_modules/
+# Downloaded fresh by `npm test`; never commit them.
+.challenge-checks/
+.challenge-checks-download/

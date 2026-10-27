@@ -1,0 +1,13 @@
+{
+  "name": "TestDojo challenges",
+  "image": "mcr.microsoft.com/devcontainers/universal:2",
+  "postCreateCommand": "npm install --no-audit --no-fund && npx playwright install --with-deps chromium",
+  "customizations": {
+    "vscode": {
+      "extensions": ["ms-playwright.playwright"]
+    },
+    "codespaces": {
+      "openFiles": ["README.md", "solutions/challenge-01-registration.ts"]
+    }
+  }
+}

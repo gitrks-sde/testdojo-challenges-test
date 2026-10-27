@@ -1,0 +1,58 @@
+# Official TestDojo challenge checks. Don't edit this file: the TestDojo
+# Challenges page only counts results produced by this exact workflow.
+name: TestDojo challenges
+
+on:
+  push:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  challenge:
+    name: Challenge ${{ matrix.id }}
+    # The template itself has no solutions; only run in learners' copies.
+    if: github.repository != 'testdojo-dev/challenges-template'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    strategy:
+      fail-fast: false
+      matrix:
+        id: ["01", "02", "03", "04"]
+    steps:
+      - name: Get your solutions
+        uses: actions/checkout@v4
+        with:
+          path: learner
+
+      - name: Get the official checks
+        uses: actions/checkout@v4
+        with:
+          repository: testdojo-dev/challenge-checks
+          path: checks
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Install Playwright
+        working-directory: checks
+        run: |
+          npm install --no-audit --no-fund --loglevel=error
+          npx playwright install --with-deps chromium
+
+      - name: Run Challenge ${{ matrix.id }}
+        working-directory: checks
+        run: |
+          rm -rf solutions
+          cp -r ../learner/solutions solutions
+          npx playwright test --grep "Challenge ${{ matrix.id }}"
+
+      - name: Keep the report if it failed
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: report-challenge-${{ matrix.id }}
+          path: checks/test-results
+          retention-days: 7
