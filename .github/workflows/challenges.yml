@@ -1,6 +1,6 @@
 # Official TestDojo challenge checks. Don't edit this file: the TestDojo
 # Challenges page only counts results produced by this exact workflow.
-name: TestDojo challenges
+name: TestDojo challenges  # tampered
 
 on:
   push:
