@@ -1,17 +1,15 @@
-import type { Page } from '@playwright/test';
+// REFERENCE SOLUTION. Never publish: used only to prove the checks pass.
+import { expect, type Page } from '@playwright/test';
+import { fillShipping, payAndConfirm } from './checkout-helpers';
 
-/**
- * Challenge 02 · First Purchase (Easy)
- * Page: Flows › E-commerce → await page.goto('/flows/shop.html')
- *
- * 1. Add one Wireless Mouse to the cart.
- * 2. Check out with any valid shipping details, Standard shipping and no promo code.
- * 3. Pay with the approved test card shown on the payment step.
- * 4. Return the order number shown on the confirmation page.
- *
- * Full details and a hint: https://testdojo.testverse.workers.dev/challenges
- */
 export async function firstPurchase(page: Page): Promise<string> {
-  // Your automation goes here.
-  throw new Error('Challenge 02 is not solved yet');
+  await page.goto('/flows/shop.html');
+  await page.getByTestId('add-to-cart-M100').click();
+  await expect(page.getByTestId('cart-count')).toHaveText('1');
+  await page.getByRole('button', { name: 'Proceed to checkout' }).click();
+
+  await page.getByRole('button', { name: 'Continue to shipping' }).click();
+  await fillShipping(page);
+  await page.getByRole('button', { name: 'Continue to payment' }).click();
+  return payAndConfirm(page);
 }

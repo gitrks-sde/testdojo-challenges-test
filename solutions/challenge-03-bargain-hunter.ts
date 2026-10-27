@@ -1,17 +1,25 @@
-import type { Page } from '@playwright/test';
+// REFERENCE SOLUTION. Never publish: used only to prove the checks pass.
+import { expect, type Page } from '@playwright/test';
+import { fillShipping, payAndConfirm } from './checkout-helpers';
 
-/**
- * Challenge 03 · Bargain Hunter (Moderate)
- * Page: Flows › E-commerce → await page.goto('/flows/shop.html')
- *
- * 1. Find the cheapest Audio product that is in stock, using the shop's filters
- *    and sorting. Don't hard-code its name.
- * 2. Buy one of it, apply promo code DOJO10 and choose Express shipping.
- * 3. Pay, and return the order number.
- *
- * Full details and a hint: https://testdojo.testverse.workers.dev/challenges
- */
 export async function bargainHunter(page: Page): Promise<string> {
-  // Your automation goes here.
-  throw new Error('Challenge 03 is not solved yet');
+  await page.goto('/flows/shop.html');
+  await page.getByLabel('Category').selectOption('Audio');
+  await page.getByLabel('In stock only').check();
+  await page.getByLabel('Sort by').selectOption('price-asc');
+
+  const cheapest = page.locator('.product-card').first();
+  await cheapest.getByRole('button', { name: 'Add to cart' }).click();
+  await expect(page.getByTestId('cart-count')).toHaveText('1');
+  await page.getByRole('button', { name: 'Proceed to checkout' }).click();
+
+  await page.getByLabel('Promo code').fill('DOJO10');
+  await page.getByRole('button', { name: 'Apply' }).click();
+  await expect(page.locator('#promo-message')).toContainText('applied');
+  await page.getByRole('button', { name: 'Continue to shipping' }).click();
+
+  await fillShipping(page);
+  await page.locator('#ship-express').check();
+  await page.getByRole('button', { name: 'Continue to payment' }).click();
+  return payAndConfirm(page);
 }

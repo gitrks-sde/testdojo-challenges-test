@@ -1,16 +1,23 @@
-import type { Page } from '@playwright/test';
+// REFERENCE SOLUTION. Never publish: used only to prove the checks pass.
+import { expect, type Page } from '@playwright/test';
 
-/**
- * Challenge 04 · Locked Out (Moderate)
- * Page: Flows › Login → await page.goto('/flows/login.html')
- *
- * 1. Fail to sign in three times with a wrong password, so the form locks.
- * 2. Wait for the lockout to end. No fixed sleeps: wait for the form to unlock.
- * 3. Sign in with the demo credentials shown on the page and finish on the dashboard.
- *
- * Full details and a hint: https://testdojo.testverse.workers.dev/challenges
- */
 export async function lockedOut(page: Page): Promise<void> {
-  // Your automation goes here.
-  throw new Error('Challenge 04 is not solved yet');
+  await page.goto('/flows/login.html');
+  const email = page.getByLabel('Email');
+  const password = page.getByLabel('Password');
+  const signIn = page.getByRole('button', { name: 'Sign In' });
+
+  for (let attempt = 1; attempt <= 3; attempt++) {
+    await email.fill('demo@test.com');
+    await password.fill('wrong-password');
+    await signIn.click();
+  }
+  await expect(signIn).toBeDisabled();
+
+  // The lockout lasts about 10 seconds; wait for the form to unlock.
+  await expect(signIn).toBeEnabled({ timeout: 20_000 });
+  await email.fill('demo@test.com');
+  await password.fill('Test1234');
+  await signIn.click();
+  await page.waitForURL(/login-dashboard/);
 }
